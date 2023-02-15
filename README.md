@@ -7,7 +7,8 @@
 # 실행 방법
 
 ```html
-$ npm install $ npm start
+$ npm install
+$ npm start
 ```
 
 # 구현 기능
