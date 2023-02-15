@@ -1,5 +1,5 @@
-const ToDoList = () => {
+const TodoList = () => {
   return <div></div>;
 };
 
-export default ToDoList;
+export default TodoList;
