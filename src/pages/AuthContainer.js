@@ -1,12 +1,80 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const AuthContainer = ({ title, text, change, isSignin }) => {
+  const [userInput, setUserInput] = useState({ email: "", password: "" });
+  const { email, password } = userInput;
   const navigate = useNavigate();
+
+  const isValid = email.includes("@") && password.length >= 8;
+
+  const handleUserInput = (e) => {
+    const { name, value } = e.target;
+    setUserInput({ ...userInput, [name]: value });
+  };
+
+  const handleAuth = () => {
+    if (!isSignin) {
+      fetch("https://pre-onboarding-selection-task.shop/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.access_token) {
+            alert("회원가입 완료");
+            navigate("/signin");
+          } else {
+            alert(data.message);
+            setUserInput({ email: "", password: "" });
+          }
+        });
+    } else {
+      fetch("https://pre-onboarding-selection-task.shop/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.access_token) {
+            console.log(data);
+            alert("로그인 성공!");
+            localStorage.setItem("token", data.access_token);
+            navigate("/todo");
+          } else {
+            alert(data.message);
+            setUserInput({ email: "", password: "" });
+          }
+        });
+    }
+  };
+
+  const handleEnterSubmit = (e) => {
+    if (e.keyCode === 13) {
+      document.getElementById("auth-button").click();
+    }
+    return;
+  };
 
   const handleSwitchChange = () => {
     navigate(`/${change}`);
   };
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      alert("자동 로그인되었습니다!");
+      navigate("/todos");
+    }
+  }, []);
 
   return (
     <App>
@@ -22,14 +90,26 @@ const AuthContainer = ({ title, text, change, isSignin }) => {
             <AuthInput
               data-testid="email-input"
               type="email"
+              name="email"
+              value={email}
               placeholder="Email"
+              onChange={handleUserInput}
             />
             <AuthInput
               data-testid="password-input"
               type="password"
+              name="password"
+              value={password}
               placeholder="Password"
+              onChange={handleUserInput}
+              onKeyDown={handleEnterSubmit}
             />
-            <AuthButton data-testid={isSignin ? "signinBtn" : "signupBtn"}>
+            <AuthButton
+              data-testid={isSignin ? "signinBtn" : "signupBtn"}
+              id="auth-button"
+              disabled={!isValid}
+              onClick={handleAuth}
+            >
               {title}
             </AuthButton>
             <SwitchText>
@@ -115,10 +195,11 @@ const AuthButton = styled.button`
   color: #fff;
   font-weight: 700;
   background-color: rgba(0, 0, 0, 0.8);
+  opacity: ${(props) => (props.disabled ? "0.8" : "1")};
   border: none;
-  cursor: pointer;
+  cursor: ${(props) => (props.disabled ? "null" : "pointer")};
   &:active {
-    transform: scale(0.99);
+    transform: ${(props) => (props.disabled ? "null" : "scale(0.99)")};
   }
   border-radius: 5px;
 `;
