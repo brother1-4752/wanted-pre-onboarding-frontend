@@ -72,7 +72,7 @@ const AuthContainer = ({ title, text, change, isSignin }) => {
   useEffect(() => {
     if (localStorage.getItem("token")) {
       alert("자동 로그인되었습니다!");
-      navigate("/todos");
+      navigate("/todo");
     }
   }, []);
 
