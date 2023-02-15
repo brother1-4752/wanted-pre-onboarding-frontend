@@ -27,7 +27,16 @@ $ npm start
 # 레퍼지토리 구조
 
 ```html
-📦src ┣ 📂 pages ┃ ┃ 📜 AuthContainer.js ┃ ┃ 📜 SignIn.js ┃ ┃ 📜 SignUp.js ┃ ┃
-📜 ToDoItem.js ┃ ┃ 📜 ToDoList.js ┣ 📂 styles ┃ ┣ 📜 GlobalStyle.js ┣ 📜 api.js
-┣ 📜 index.js ┗ 📜 Router.js
+📦src
+ ┣ 📂 pages
+ ┃ ┃ 📜 AuthContainer.js
+ ┃ ┃ 📜 SignIn.js
+ ┃ ┃ 📜 SignUp.js
+ ┃ ┃ 📜 ToDoItem.js
+ ┃ ┃ 📜 ToDoList.js
+ ┣ 📂 styles
+ ┃ ┣ 📜 GlobalStyle.js
+ ┣ 📜 api.js
+ ┣ 📜 index.js
+ ┗ 📜 Router.js
 ```
