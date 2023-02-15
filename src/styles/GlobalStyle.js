@@ -5,10 +5,10 @@ const GlobalStyle = createGlobalStyle`
   ${reset}
   * {
     box-sizing: border-box;
+    color : #3366ff;
   }
   
   body {
-    color : #333333;
     font-family: Arial, sans-serif;
   }
 `;

@@ -7,7 +7,7 @@ const SignIn = () => {
 export default SignIn;
 
 const SIGNIN_DATA = {
-  change: "SignUp",
+  change: "Signup",
   title: "로그인",
   text: "회원가입 하러 가기",
 };

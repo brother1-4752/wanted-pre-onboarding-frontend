@@ -1,26 +1,143 @@
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import ToDoItems from "./ToDoItems";
+import ToDoItem from "./ToDoItem";
+import API from "../api";
 
 const ToDoList = () => {
+  const [taskInput, setTaskInput] = useState("");
+  const [toDoList, setToDoList] = useState([]);
+
+  const navigate = useNavigate();
+
+  const handleTaskInput = (e) => {
+    setTaskInput(e.target.value);
+  };
+
+  const getToDoList = () => {
+    fetch(`${API.TODOS}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
+          setToDoList(data);
+        } else {
+          alert("ToDo Item를 가져오지 못했습니다.");
+        }
+      });
+  };
+
+  const createToDoItem = () => {
+    if (taskInput.length === 0) {
+      alert("한글자 이상 입력이 필요합니다.");
+      return;
+    }
+
+    fetch(`${API.TODOS}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ todo: taskInput }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.todo) {
+          alert("ToDo Item 등록완료");
+          getToDoList();
+          setTaskInput("");
+        } else {
+          alert("ToDo Item 등록에 실패했습니다.");
+        }
+      });
+  };
+
+  const deleteToDoItem = useCallback((id) => {
+    fetch(`${API.TODOS}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    }).then((res) => {
+      if (res.status === 204) {
+        alert("ToDo Item 삭제 완료");
+        getToDoList();
+      } else {
+        alert("ToDo Item 삭제 실패");
+      }
+    });
+  }, []);
+
+  const updateToDoItem = useCallback((id, todo, isCompleted, status) => {
+    fetch(`${API.TODOS}/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ todo: todo, isCompleted: isCompleted }),
+    }).then((res) => {
+      if (res.status === 200) {
+        alert(`TODO는 ${status}`);
+        getToDoList();
+      } else {
+        alert("ToDo Item 수정 실패");
+      }
+    });
+  }, []);
+
+  const handleEnterSubmit = (e) => {
+    if (e.keyCode === 13) {
+      document.getElementById("add-button").click();
+    }
+    return;
+  };
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      alert("우선 로그인을 진행해주세요.");
+      navigate("/signin");
+    }
+    getToDoList();
+  }, []);
+
+  useEffect(() => {
+    const titleElement = document.getElementsByTagName("title")[0];
+    titleElement.innerHTML = "투두 리스트";
+  }, []);
+
   return (
     <App>
       <MainBox>
         <MainHeader>
-          <HeaderTitle>ToDoList</HeaderTitle>
+          <Title>ToDoList</Title>
         </MainHeader>
         <BodyBox>
           <AddToDos
             data-testid="new-todo-input"
             type="text"
             placeholder="새로운 할 일을 추가해보세요."
+            value={taskInput}
+            onChange={handleTaskInput}
+            onKeyDown={handleEnterSubmit}
           />
-          <AddBtn data-testid="new-todo-add-button" type="submit">
+          <AddBtn
+            data-testid="new-todo-add-button"
+            id="add-button"
+            onClick={createToDoItem}
+          >
             추가하기
           </AddBtn>
         </BodyBox>
         <ListBox>
           {toDoList.map((toDo) => (
-            <ToDoItems key={toDo.id} {...toDo} />
+            <ToDoItem
+              key={toDo.id}
+              {...toDo}
+              deleteToDoItem={deleteToDoItem}
+              updateToDoItem={updateToDoItem}
+            />
           ))}
         </ListBox>
       </MainBox>
@@ -51,7 +168,7 @@ const MainHeader = styled.div`
   align-items: center;
 `;
 
-const HeaderTitle = styled.h1`
+const Title = styled.h1`
   font-size: 30px;
   font-weight: 700;
 `;
@@ -70,10 +187,10 @@ const AddToDos = styled.input`
   width: 100%;
   height: 50px;
   outline: none;
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  border: 1px solid #3366ff;
   border-radius: 8px;
   &:focus {
-    border: 1.5px solid rgba(0, 0, 0, 0.8);
+    border: 1.5px solid #3366ff;
     ::placeholder {
       color: transparent;
     }
@@ -87,7 +204,6 @@ const AddToDos = styled.input`
 const AddBtn = styled.button`
   position: absolute;
   right: 10px;
-  //   bottom: 50%;
   width: 80px;
   height: 30px;
   border-radius: 8px;
@@ -97,7 +213,7 @@ const AddBtn = styled.button`
 
 const ListBox = styled.ul`
   padding: 10px;
-  border: 1px solid #888c8d;
+  border: 1px solid #3366ff;
   border-radius: 5px;
   overflow-y: scroll;
   ::-webkit-scrollbar {
@@ -109,16 +225,8 @@ const ListBox = styled.ul`
     height: 50px;
   }
   ::-webkit-scrollbar-track {
-    background: rgba(128, 128, 128, 0.2); /*스크롤바 뒷 배경 색상*/
+    background: rgba(128, 128, 128, 0.3); /*스크롤바 뒷 배경 색상*/
   }
 `;
 
 export default ToDoList;
-
-const toDoList = [
-  { id: 1, todo: "할일 1" },
-  { id: 2, todo: "할일 2" },
-  { id: 3, todo: "할일 3" },
-  { id: 4, todo: "할일 4" },
-  { id: 5, todo: "할일 5" },
-];

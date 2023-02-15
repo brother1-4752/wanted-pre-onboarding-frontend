@@ -152,7 +152,7 @@ const HeaderTitle = styled.h1`
 const BodyBox = styled.div`
   width: 500px;
   height: 500px;
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  border: 1px solid #3366ff;
   border-radius: 8px;
 `;
 
@@ -182,7 +182,7 @@ const AuthInput = styled.input`
   height: 15%;
   &:focus {
     outline: none;
-    border: 1.5px solid rgba(0, 0, 0, 0.8);
+    border: 1.5px solid #3366ff;
     ::placeholder {
       color: transparent;
     }
@@ -194,7 +194,7 @@ const AuthButton = styled.button`
   height: 20%;
   color: #fff;
   font-weight: 700;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #3366ff;
   opacity: ${(props) => (props.disabled ? "0.8" : "1")};
   border: none;
   cursor: ${(props) => (props.disabled ? "null" : "pointer")};
@@ -207,7 +207,6 @@ const AuthButton = styled.button`
 const SwitchText = styled.p`
   font-size: 14px;
   text-align: center;
-  color: #888c8d;
 `;
 
 const Switch = styled.span`
