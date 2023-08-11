@@ -1,11 +1,28 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import Layout from './components/common/Layout';
+import hasAuth from './utils/hasAuth';
+import { useCallback, useEffect } from 'react';
 
 function App() {
+  const navigate = useNavigate();
+  const callback = useCallback(() => {
+    if (hasAuth()) {
+      navigate('/todo');
+      return <></>;
+    } else {
+      navigate('/signin');
+      return <></>;
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    callback();
+  }, [callback]);
+
   return (
-    <div>
-      <h1>프리온보딩 사전과제</h1>
+    <Layout>
       <Outlet />
-    </div>
+    </Layout>
   );
 }
 

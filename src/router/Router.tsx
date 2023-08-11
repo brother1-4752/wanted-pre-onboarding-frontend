@@ -1,33 +1,29 @@
 import { createBrowserRouter } from 'react-router-dom';
-import App from '../App';
-import Home from '../pages/home/Home';
-import SignIn from '../pages/signin/SignIn';
-import SignUp from '../pages/signup/SignUp';
-import ToDo from '../pages/todo/ToDo';
 
-const router = createBrowserRouter([
+import { ErrorBoundary, Home, SignIn, SignUp, ToDo } from '../pages';
+import App from '../App';
+
+interface IRouter {
+  path: string;
+  element: React.ReactNode;
+  children?: IRouter[];
+  errorElement?: React.ReactNode;
+}
+
+const routerData: IRouter[] = [
   {
     path: '/',
     element: <App />,
+    errorElement: <ErrorBoundary />,
     children: [
-      {
-        path: '',
-        element: <Home />,
-      },
-      {
-        path: '/signin',
-        element: <SignIn />,
-      },
-      {
-        path: '/signup',
-        element: <SignUp />,
-      },
-      {
-        path: '/todo',
-        element: <ToDo />,
-      },
+      { path: '', element: <Home /> },
+      { path: '/signin', element: <SignIn /> },
+      { path: '/signup', element: <SignUp /> },
+      { path: '/todo', element: <ToDo /> },
     ],
   },
-]);
+];
 
-export default router
+const router = createBrowserRouter(routerData);
+
+export default router;
