@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import SignInContainer from '../../components/SignContainer';
 import fetchDataByAxios from '../../utils/fetchDataByAxios';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 function SignIn() {
   const [email, setEmail, onChangeEmail, validatedByEmail] = useInput(
@@ -31,11 +31,13 @@ function SignIn() {
         alert('로그인에 성공했습니다. \n투두리스트 화면으로 이동합니다.');
         localStorage.setItem('access_token', response.data.access_token);
         navigate('/todo');
+      } else {
+        alert(response);
       }
-    } catch (error: any) {
-      const errMsg = error.response.data.message;
-      if (errMsg === 'Unauthorized') {
-        alert('인증에 실패했습니다');
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        console.log(axiosError.response?.data);
       }
       setEmail('');
       setPassword('');

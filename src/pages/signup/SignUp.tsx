@@ -1,5 +1,5 @@
 import { FormEvent } from 'react';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
 import useInput from '../../hooks/input/useInput';
 import { useNavigate } from 'react-router-dom';
@@ -30,9 +30,14 @@ function SignUp() {
       if (response.status === 201) {
         alert('회원가입에 성공했습니다. \n로그인 화면으로 이동합니다.');
         navigate('/signin');
+      } else {
+        alert(response);
       }
-    } catch (error: any) {
-      alert(error.response.data.message);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        console.log(axiosError.response?.data);
+      }
       setEmail('');
       setPassword('');
     }
