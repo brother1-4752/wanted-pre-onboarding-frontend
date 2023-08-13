@@ -15,6 +15,7 @@ const StyledLayout = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
   border: 1px solid black;
   border-radius: 15px;
