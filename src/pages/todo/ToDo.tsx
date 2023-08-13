@@ -1,90 +1,62 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
 
-interface ITodo {
-  id: number;
-  todo: string;
-  isCompleted: boolean;
-  userId: number;
-}
+import fetchDataByAxios from '../../utils/fetchDataByAxios';
+import useInput from '../../hooks/input/useInput';
+import { ITodo } from '../../types/input';
 
 function ToDo() {
-  const token = localStorage.getItem('access_token');
-
+  const [modifiedTodo, , onChangeModifiedTodo] = useInput('', 'modifiedTodo');
+  const [todo, setTodo, onChangeTodo] = useInput('', 'todo');
   const [todoList, setTodoList] = useState<ITodo[]>([]);
-  const [todo, setTodo] = useState<string>('');
+  const [updateId, setUpdateId] = useState<number>();
+
+  const fetchData = fetchDataByAxios();
 
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await axios.get(
-          'https://www.pre-onboarding-selection-task.shop/todos',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    fetchData('get', 'todos')
+      .then((response: any) => {
         if (response.status === 200) {
           setTodoList(response.data);
         }
-      } catch (error) {
+        console.log(response);
+      })
+      .catch((error) => {
         console.log(error);
-      }
-    })();
+      });
   }, []);
 
-  const handleToDoSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitTodo = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    try {
-      const response = await axios.post(
-        'https://www.pre-onboarding-selection-task.shop/todos',
-        { todo },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      const newTodo: ITodo = {
-        id: response.data.id,
-        todo: response.data.todo,
-        isCompleted: response.data.isCompleted,
-        userId: response.data.userId,
-      };
-
-      setTodoList((prev) => [...prev, newTodo]);
-      setTodo('');
-    } catch (error: any) {
-      alert(error.response.data.message[0]);
+    if (todo.length === 0) {
+      alert('빈 칸입니다');
+      return <></>;
     }
-  };
 
-  const handleChangeByTodo = (e: ChangeEvent<HTMLInputElement>) => {
-    setTodo(e.target.value);
+    fetchData('post', 'todos', { todo })
+      .then((response: any) => {
+        if (response.status === 201) {
+          const newTodo: ITodo = {
+            id: response.data.id,
+            todo: response.data.todo,
+            isCompleted: response.data.isCompleted,
+            userId: response.data.userId,
+          };
+          setTodoList((prev) => [...prev, newTodo]);
+          setTodo('');
+        }
+      })
+      .catch((error) => console.log(error));
   };
 
   const handleDeleteButton = (todoId: number) => {
-    (async () => {
-      try {
-        await axios.delete(
-          `https://www.pre-onboarding-selection-task.shop/todos/${todoId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-
-    setTodoList((prev) => prev.filter((el, index) => el.id !== todoId));
+    fetchData('delete', `todos/${todoId}`)
+      .then((response: any) => {
+        if (response.status === 204) {
+          setTodoList((prev) => prev.filter((el, index) => el.id !== todoId));
+        }
+      })
+      .catch((error) => console.log(error));
   };
 
   const handleChageByCheckbox = (i: number) => {
@@ -102,36 +74,41 @@ function ToDo() {
   };
 
   const handleUpdateButton = (todoId: number) => {
-    const { todo, isCompleted } = todoList.filter(
-      (el, index) => el.id === todoId
-    )[0];
+    setUpdateId(todoId);
+  };
 
-    const data = { todo, isCompleted };
+  const handleUpdateSubmitButton = (todoId: number) => {
+    const { isCompleted } = todoList.filter((el) => el.id === todoId)[0];
 
-    (async () => {
-      try {
-        await axios.put(
-          `https://www.pre-onboarding-selection-task.shop/todos/${todoId}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
+    setUpdateId(0);
+    const data = { todo: modifiedTodo, isCompleted };
+
+    fetchData('put', `todos/${todoId}`, data).then((response: any) => {
+      if (response.status === 200) {
+        const updatedTodo: ITodo = {
+          id: response.data.id,
+          todo: response.data.todo,
+          isCompleted: response.data.isCompleted,
+          userId: response.data.userId,
+        };
+        setTodoList((prev: ITodo[]) =>
+          prev.map((el) => {
+            if (el.id === todoId) {
+              return updatedTodo;
+            }
+            return el;
+          })
         );
-      } catch (error) {
-        console.error(error);
       }
-    })();
+    });
   };
 
   return (
     <StyledTodoContainer>
       <h1>투두리스트</h1>
-      <form onSubmit={handleToDoSubmit}>
+      <form onSubmit={handleSubmitTodo}>
         <input
-          onChange={handleChangeByTodo}
+          onChange={onChangeTodo}
           data-testid="new-todo-input"
           value={todo}
           type="text"
@@ -150,26 +127,54 @@ function ToDo() {
                 onChange={() => handleChageByCheckbox(index)}
                 checked={el.isCompleted}
               />
-              <span
-                style={{
-                  textDecoration: el.isCompleted ? 'line-through' : 'none',
-                }}
-              >
-                {el.todo}
-              </span>
+              {updateId === el.id ? (
+                <input
+                  type="text"
+                  data-testid="modify-input"
+                  onChange={onChangeModifiedTodo}
+                  defaultValue={el.todo}
+                />
+              ) : (
+                <span
+                  style={{
+                    textDecoration: el.isCompleted ? 'line-through' : 'none',
+                  }}
+                >
+                  {el.todo}
+                </span>
+              )}
             </label>
-            <button
-              data-testid="update-button"
-              onClick={() => handleUpdateButton(el.id)}
-            >
-              수정
-            </button>
-            <button
-              data-testid="delete-button"
-              onClick={() => handleDeleteButton(el.id)}
-            >
-              삭제
-            </button>
+            {updateId === el.id ? (
+              <>
+                <button
+                  data-testid="submit-button"
+                  onClick={() => handleUpdateSubmitButton(el.id)}
+                >
+                  제출
+                </button>
+                <button
+                  data-testid="cancel-button"
+                  onClick={() => setUpdateId(0)}
+                >
+                  취소
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  data-testid="modify-button"
+                  onClick={() => handleUpdateButton(el.id)}
+                >
+                  수정
+                </button>
+                <button
+                  data-testid="delete-button"
+                  onClick={() => handleDeleteButton(el.id)}
+                >
+                  삭제
+                </button>
+              </>
+            )}
           </li>
         ))}
       </ul>

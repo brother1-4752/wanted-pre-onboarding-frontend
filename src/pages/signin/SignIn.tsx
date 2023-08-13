@@ -1,9 +1,11 @@
 import { FormEvent } from 'react';
-import axios from 'axios';
 
 import useInput from '../../hooks/input/useInput';
 import { useNavigate } from 'react-router-dom';
+
 import SignInContainer from '../../components/SignContainer';
+import fetchDataByAxios from '../../utils/fetchDataByAxios';
+import { AxiosResponse } from 'axios';
 
 function SignIn() {
   const [email, setEmail, onChangeEmail, validatedByEmail] = useInput(
@@ -13,23 +15,18 @@ function SignIn() {
   const [password, setPassword, onChangePassword, validatedByPassword] =
     useInput('', 'password');
   const navigate = useNavigate();
+  const fetchData = fetchDataByAxios();
 
   const isConfirmed = validatedByEmail && validatedByPassword;
 
-  //onSubmit
   const handleSignInSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post(
-        'https://www.pre-onboarding-selection-task.shop/auth/signin',
-        { email, password },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = (await fetchData('post', 'auth/signin', {
+        email,
+        password,
+      })) as AxiosResponse;
+
       if (response.status === 200) {
         alert('로그인에 성공했습니다. \n투두리스트 화면으로 이동합니다.');
         localStorage.setItem('access_token', response.data.access_token);

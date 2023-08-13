@@ -7,4 +7,11 @@ export type InputReturnTypes<T> = [
   boolean | undefined
 ];
 
-export type InputTypes = 'email' | 'password';
+export type InputTypes = 'email' | 'password' | 'modifiedTodo' | 'todo';
+
+export interface ITodo {
+  id: number;
+  todo: string;
+  isCompleted: boolean;
+  userId: number;
+}
