@@ -13,7 +13,7 @@ const StyledLayout = styled.div`
   height: 600px;
 
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
 
   border: 1px solid black;
