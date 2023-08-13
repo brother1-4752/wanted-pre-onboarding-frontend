@@ -1,19 +1,19 @@
-import { useNavigate } from 'react-router-dom';
-import useInput from '../../hooks/input/useInput';
 import { FormEvent } from 'react';
 import axios from 'axios';
 
+import useInput from '../../hooks/input/useInput';
+import { useNavigate } from 'react-router-dom';
+
 function SignIn() {
-  const {
-    handleEmailChange,
-    handlePasswordChange,
-    isConfirmed,
-    email,
-    password,
-    setEmail,
-    setPassword,
-  } = useInput();
+  const [email, setEmail, onChangeEmail, validatedByEmail] = useInput(
+    '',
+    'email'
+  );
+  const [password, setPassword, onChangePassword, validatedByPassword] =
+    useInput('', 'password');
   const navigate = useNavigate();
+
+  const isConfirmed = validatedByEmail && validatedByPassword;
 
   //onSubmit
   const handleSignInSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -30,7 +30,6 @@ function SignIn() {
         }
       );
       if (response.status === 200) {
-        console.log(response.data.access_token);
         alert('로그인에 성공했습니다. \n투두리스트 화면으로 이동합니다.');
         localStorage.setItem('access_token', response.data.access_token);
         navigate('/todo');
@@ -56,7 +55,7 @@ function SignIn() {
           id="email"
           placeholder="이메일"
           value={email}
-          onChange={handleEmailChange}
+          onChange={onChangeEmail}
           required
         />
         <input
@@ -65,7 +64,7 @@ function SignIn() {
           id="password"
           placeholder="비밀번호"
           value={password}
-          onChange={handlePasswordChange}
+          onChange={onChangePassword}
           required
         />
         <button

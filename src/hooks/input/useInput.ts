@@ -1,41 +1,20 @@
 import { ChangeEvent, useState } from 'react';
+import { InputReturnTypes, InputTypes } from '../../types/input';
+import validateInput from '../../utils/validateInput';
 
-const useInput = () => {
-  const [isValidatedByEmail, setIsValidatedByEmail] = useState(false);
-  const [isValidatedByPassword, setIsValidatedByPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const useInput = <T>(
+  initialValue: T,
+  inputType: InputTypes
+): InputReturnTypes<T> => {
+  const [value, setValue] = useState(initialValue);
 
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const em = e.target.value;
-    if (em.includes('@')) {
-      setIsValidatedByEmail(true);
-    } else {
-      setIsValidatedByEmail(false);
-    }
-    setEmail(em);
-  };
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const pw = e.target.value;
-    if (pw.length >= 8) {
-      setIsValidatedByPassword(true);
-    } else {
-      setIsValidatedByPassword(false);
-    }
-    setPassword(pw);
+  const onChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value as T);
   };
 
-  const isConfirmed = isValidatedByEmail && isValidatedByPassword;
+  const isValidated = validateInput(value, inputType);
 
-  return {
-    handleEmailChange,
-    handlePasswordChange,
-    isConfirmed,
-    email,
-    password,
-    setEmail,
-    setPassword,
-  };
+  return [value, setValue, onChangeHandler, isValidated];
 };
 
 export default useInput;
