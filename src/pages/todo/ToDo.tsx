@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import styled from 'styled-components';
+import StyledTodoContainer from './ToDo.styled';
 
 import fetchDataByAxios from '../../utils/fetchDataByAxios';
 import useInput from '../../hooks/input/useInput';
@@ -105,90 +105,92 @@ function ToDo() {
 
   return (
     <StyledTodoContainer>
-      <h1>투두리스트</h1>
-      <form onSubmit={handleSubmitTodo}>
-        <input
-          onChange={onChangeTodo}
-          data-testid="new-todo-input"
-          value={todo}
-          type="text"
-        />
-        <button type="submit" data-testid="new-todo-add-button">
-          추가
-        </button>
-      </form>
+      <h1 className="todo__title">투두리스트</h1>
+      <div className="todo__wrapper">
+        <form className="todo__form" onSubmit={handleSubmitTodo}>
+          <input
+            className="todo__input--todo"
+            onChange={onChangeTodo}
+            data-testid="new-todo-input"
+            value={todo}
+            type="text"
+            placeholder="할 일을 입력하세요."
+          />
+          <button
+            className="todo__button--add"
+            type="submit"
+            data-testid="new-todo-add-button"
+          >
+            추가
+          </button>
+        </form>
 
-      <ul>
-        {todoList.map((el, index) => (
-          <li key={el.id}>
-            <label>
-              <input
-                type="checkbox"
-                onChange={() => handleChageByCheckbox(index)}
-                checked={el.isCompleted}
-              />
-              {updateId === el.id ? (
+        <ul className='todo__list'>
+          {todoList.map((el, index) => (
+            <li className='todo__list--item' key={el.id}>
+              <label>
                 <input
-                  type="text"
-                  data-testid="modify-input"
-                  onChange={onChangeModifiedTodo}
-                  defaultValue={el.todo}
+                  className='todo__list--checkbox'
+                  type="checkbox"
+                  onChange={() => handleChageByCheckbox(index)}
+                  checked={el.isCompleted}
                 />
+                {updateId === el.id ? (
+                  <input
+                    className='todo__list--spacing'
+                    type="text"
+                    data-testid="modify-input"
+                    onChange={onChangeModifiedTodo}
+                    defaultValue={el.todo}
+                  />
+                ) : (
+                  <span
+                    className='todo__list--spacing'
+                    style={{
+                      textDecoration: el.isCompleted ? 'line-through' : 'none',
+                    }}
+                  >
+                    {el.todo}
+                  </span>
+                )}
+              </label>
+              {updateId === el.id ? (
+                <>
+                  <button
+                    data-testid="submit-button"
+                    onClick={() => handleUpdateSubmitButton(el.id)}
+                  >
+                    제출
+                  </button>
+                  <button
+                    data-testid="cancel-button"
+                    onClick={() => setUpdateId(0)}
+                  >
+                    취소
+                  </button>
+                </>
               ) : (
-                <span
-                  style={{
-                    textDecoration: el.isCompleted ? 'line-through' : 'none',
-                  }}
-                >
-                  {el.todo}
-                </span>
+                <>
+                  <button
+                    data-testid="modify-button"
+                    onClick={() => handleUpdateButton(el.id)}
+                  >
+                    수정
+                  </button>
+                  <button
+                    data-testid="delete-button"
+                    onClick={() => handleDeleteButton(el.id)}
+                  >
+                    삭제
+                  </button>
+                </>
               )}
-            </label>
-            {updateId === el.id ? (
-              <>
-                <button
-                  data-testid="submit-button"
-                  onClick={() => handleUpdateSubmitButton(el.id)}
-                >
-                  제출
-                </button>
-                <button
-                  data-testid="cancel-button"
-                  onClick={() => setUpdateId(0)}
-                >
-                  취소
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  data-testid="modify-button"
-                  onClick={() => handleUpdateButton(el.id)}
-                >
-                  수정
-                </button>
-                <button
-                  data-testid="delete-button"
-                  onClick={() => handleDeleteButton(el.id)}
-                >
-                  삭제
-                </button>
-              </>
-            )}
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
     </StyledTodoContainer>
   );
 }
-
-const StyledTodoContainer = styled.div`
-  width: 300px;
-  height: 80%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 export default ToDo;
