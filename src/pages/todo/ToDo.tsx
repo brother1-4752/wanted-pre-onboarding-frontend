@@ -83,8 +83,47 @@ function ToDo() {
         console.error(error);
       }
     })();
-    
+
     setTodoList((prev) => prev.filter((el, index) => el.id !== todoId));
+  };
+
+  const handleChageByCheckbox = (i: number) => {
+    const TodoUpdatedByChecked = todoList.map((el, index) =>
+      index === i
+        ? {
+            id: el.id,
+            isCompleted: !el.isCompleted,
+            todo: el.todo,
+            userId: el.userId,
+          }
+        : el
+    );
+    setTodoList(TodoUpdatedByChecked);
+  };
+
+  const handleUpdateButton = (todoId: number) => {
+    const { todo, isCompleted } = todoList.filter(
+      (el, index) => el.id === todoId
+    )[0];
+
+    const data = { todo, isCompleted };
+
+    (async () => {
+      try {
+        await axios.put(
+          `https://www.pre-onboarding-selection-task.shop/todos/${todoId}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    })();
   };
 
   return (
@@ -106,10 +145,25 @@ function ToDo() {
         {todoList.map((el, index) => (
           <li key={el.id}>
             <label>
-              <input type="checkbox" />
-              <span>{el.todo}</span>
+              <input
+                type="checkbox"
+                onChange={() => handleChageByCheckbox(index)}
+                checked={el.isCompleted}
+              />
+              <span
+                style={{
+                  textDecoration: el.isCompleted ? 'line-through' : 'none',
+                }}
+              >
+                {el.todo}
+              </span>
             </label>
-            <button data-testid="update-button">수정</button>
+            <button
+              data-testid="update-button"
+              onClick={() => handleUpdateButton(el.id)}
+            >
+              수정
+            </button>
             <button
               data-testid="delete-button"
               onClick={() => handleDeleteButton(el.id)}
