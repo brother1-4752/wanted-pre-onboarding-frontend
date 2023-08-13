@@ -77,6 +77,7 @@ function SignIn() {
           type="submit"
           data-testid="signin-button"
           disabled={isConfirmed ? false : true}
+          style={{ backgroundColor: isConfirmed ? '#18c37d' : 'gray' }}
         >
           로그인
         </button>

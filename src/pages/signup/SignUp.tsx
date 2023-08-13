@@ -73,6 +73,7 @@ function SignUp() {
           type="submit"
           data-testid="signup-button"
           disabled={isConfirmed ? false : true}
+          style={{ backgroundColor: isConfirmed ? '#18c37d' : 'gray' }}
         >
           회원가입
         </button>
