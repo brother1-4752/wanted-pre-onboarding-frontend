@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import useInput from '../../hooks/input/useInput';
 import { useNavigate } from 'react-router-dom';
+import SignInContainer from '../../components/SignContainer';
 
 function SignUp() {
   const [email, setEmail, onChangeEmail, validatedByEmail] = useInput(
@@ -41,29 +42,34 @@ function SignUp() {
   };
 
   return (
-    <div>
-      <h1>회원가입</h1>
+    <SignInContainer>
+      <h1 className="sign__title">회원가입</h1>
 
-      <form onSubmit={handleSignUpSubmit}>
-        <input
-          data-testid="email-input"
-          type="email"
-          id="email"
-          placeholder="이메일"
-          value={email}
-          onChange={onChangeEmail}
-          required
-        />
-        <input
-          data-testid="password-input"
-          type="password"
-          id="password"
-          placeholder="비밀번호"
-          value={password}
-          onChange={onChangePassword}
-          required
-        />
+      <form className="sign__form" onSubmit={handleSignUpSubmit}>
+        <div className="sign__inputs">
+          <input
+            className="sign__input"
+            data-testid="email-input"
+            type="email"
+            id="email"
+            placeholder="이메일"
+            value={email}
+            onChange={onChangeEmail}
+            required
+          />
+          <input
+            className="sign__input"
+            data-testid="password-input"
+            type="password"
+            id="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={onChangePassword}
+            required
+          />
+        </div>
         <button
+          className="sign__button"
           type="submit"
           data-testid="signup-button"
           disabled={isConfirmed ? false : true}
@@ -71,7 +77,7 @@ function SignUp() {
           회원가입
         </button>
       </form>
-    </div>
+    </SignInContainer>
   );
 }
 

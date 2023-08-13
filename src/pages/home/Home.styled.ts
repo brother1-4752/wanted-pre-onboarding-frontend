@@ -13,8 +13,7 @@ const HomeContainer = styled.div`
     line-height: 30px;
     font-size: 24px;
 
-    border-right: 1px solid black;
-    color: black;
+    color: white;
     background-color: #18c37d;
     border-radius: 15px 0 0 15px;
 

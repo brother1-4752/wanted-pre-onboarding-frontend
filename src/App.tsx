@@ -1,7 +1,8 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import Layout from './components/common/Layout';
+
 import hasAuth from './utils/hasAuth';
 import { useCallback, useEffect } from 'react';
+import Layout from './components/Layout';
 
 function App() {
   const navigate = useNavigate();
