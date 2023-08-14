@@ -13,7 +13,7 @@
 git clone https://github.com/brother1-4752/wanted-pre-onboarding-frontend.git
 
 npm install
-npm run start
+npm start
 ```
 
 ### 배포 링크
