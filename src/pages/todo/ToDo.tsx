@@ -4,6 +4,7 @@ import StyledTodoContainer from './ToDo.styled';
 import fetchDataByAxios from '../../utils/fetchDataByAxios';
 import useInput from '../../hooks/input/useInput';
 import { ITodo } from '../../types/input';
+import ToDoList from './ToDoList';
 
 function ToDo() {
   const [modifiedTodo, , onChangeModifiedTodo] = useInput('', 'modifiedTodo');
@@ -125,69 +126,15 @@ function ToDo() {
           </button>
         </form>
 
-        <ul className='todo__list'>
-          {todoList.map((el, index) => (
-            <li className='todo__list--item' key={el.id}>
-              <label>
-                <input
-                  className='todo__list--checkbox'
-                  type="checkbox"
-                  onChange={() => handleChageByCheckbox(index)}
-                  checked={el.isCompleted}
-                />
-                {updateId === el.id ? (
-                  <input
-                    className='todo__list--spacing'
-                    type="text"
-                    data-testid="modify-input"
-                    onChange={onChangeModifiedTodo}
-                    defaultValue={el.todo}
-                  />
-                ) : (
-                  <span
-                    className='todo__list--spacing'
-                    style={{
-                      textDecoration: el.isCompleted ? 'line-through' : 'none',
-                    }}
-                  >
-                    {el.todo}
-                  </span>
-                )}
-              </label>
-              {updateId === el.id ? (
-                <>
-                  <button
-                    data-testid="submit-button"
-                    onClick={() => handleUpdateSubmitButton(el.id)}
-                  >
-                    제출
-                  </button>
-                  <button
-                    data-testid="cancel-button"
-                    onClick={() => setUpdateId(0)}
-                  >
-                    취소
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    data-testid="modify-button"
-                    onClick={() => handleUpdateButton(el.id)}
-                  >
-                    수정
-                  </button>
-                  <button
-                    data-testid="delete-button"
-                    onClick={() => handleDeleteButton(el.id)}
-                  >
-                    삭제
-                  </button>
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+        <ToDoList
+          handleUpdateSubmitButton={handleUpdateSubmitButton}
+          handleChageByCheckbox={handleChageByCheckbox}
+          onChangeModifiedTodo={onChangeModifiedTodo}
+          handleDeleteButton={handleDeleteButton}
+          handleUpdateButton={handleUpdateButton}
+          useUpdateId={[updateId, setUpdateId]}
+          todoList={todoList}
+        />
       </div>
     </StyledTodoContainer>
   );
